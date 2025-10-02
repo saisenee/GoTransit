@@ -5,23 +5,11 @@
   "main": "node-fetch.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/saisenee/GOTransitAPI.git"
-  },
+  }, 
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/saisenee/GOTransitAPI/issues"
-  },
-  "homepage": "https://github.com/saisenee/GOTransitAPI#readme",
+  "license": "ISC",  
   "dependencies": {
-<<<<<<< HEAD
     "express": "^5.1.0"
-=======
-    "node-fetch": "^3.3.2"
->>>>>>> aef3afa51e758fad077ff5eaaafb9a0fb307943e
   }
 }
