@@ -1,0 +1,103 @@
+<<<<<<< HEAD:public/style.css
+
+.reddit-sans-departures {
+  font-family: "Reddit Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 750;
+  font-style: normal;
+}
+
+.reddit-sans-body {
+  font-family: "Reddit Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+    margin: 10px;
+    padding: 0;
+}
+
+body{
+  font-family: "Reddit Sans", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ABFF98;
+    color: #333;
+    
+}
+header{
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+nav{
+    margin: 0;
+    padding: 10px;
+    background-color: #2a2100;
+    color: white;
+}
+
+#logo {
+    height: 20px;
+    padding-left: 10px;
+    vertical-align: middle;
+}
+
+#navgrid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 15px;
+}
+=======
+
+.reddit-sans-departures {
+  font-family: "Reddit Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 750;
+  font-style: normal;
+}
+
+.reddit-sans-body {
+  font-family: "Reddit Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+    margin: 10px;
+    padding: 0;
+}
+
+body{
+  font-family: "Reddit Sans", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    
+}
+header{
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+nav{
+    margin: 0;
+    padding: 10px;
+    background-color: #2a2100;
+    color: white;
+}
+
+#logo {
+    height: 20px;
+    padding-left: 10px;
+    vertical-align: middle;
+}
+
+#navgrid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 15px;
+}
+>>>>>>> aef3afa51e758fad077ff5eaaafb9a0fb307943e:style.css

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    <title>GO Transit API</title>
+</head>
+<nav>
+    <div id="navgrid">
+    <img id="logo" src="img/GO_Transit_logo.svg" alt="GO Transit Logo" class="logo">
+    <h1 class="reddit-sans-departures">Departures</h1>
+    </div>
+    </div>
+</nav>
+<body>
+   <p id="loading" class="reddit-sans-body">Loading...</p>
+    <div id="departures"></div>
+    <div id="search">
+        <h2 class="reddit-sans-body">Search</h2>
+        <form id="searchForm">
+            <label for="to" class="reddit-sans-body">To:</label>
+            <input type="text" id="to" name="to" value="un" required>
+            <label for="start" class="reddit-sans-body">Start Time (HHMM):</label>
+            <input type="text" id="start" name="start" value="0900" required>
+            <label for="max" class="reddit-sans-body">Max Results:</label>
+            <button type="submit" class="reddit-sans-body">Search</button>
+        </form>
+</body>
+<script src="script.js"></script>
+</html>
