@@ -20,15 +20,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Now fetch journeys and display departures
-      fetch('/api/journeys?date=20251009&from=oa&to=un&start=0900&max=10')
-        .then(res => res.json())
-        .then(data => {
+      // Function to fetch journeys starting from the current time and render
+      function getYYYYMMDD(d) {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}${mm}${dd}`;
+      }
+
+      function getHHMM(d) {
+        return String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0');
+      }
+
+      function parseTimeString(t) {
+        if (!t) return NaN;
+        if (typeof t !== 'string') return NaN;
+        if (t.includes(':')) {
+          // assume HH:MM or H:MM
+          const parts = t.split(':');
+          const hh = parseInt(parts[0], 10);
+          const mm = parseInt(parts[1], 10);
+          return hh * 60 + mm;
+        }
+        // assume HHMM
+        if (t.length === 4 && /^\d{4}$/.test(t)) {
+          const hh = parseInt(t.slice(0, 2), 10);
+          const mm = parseInt(t.slice(2), 10);
+          return hh * 60 + mm;
+        }
+        return NaN;
+      }
+
+      function computeDelayMinutes(scheduledStr, actualStr) {
+        const s = parseTimeString(scheduledStr);
+        const a = parseTimeString(actualStr);
+        if (isNaN(s) || isNaN(a)) return null;
+        return a - s; // minutes (positive = delayed)
+      }
+
+      async function fetchAndRenderJourneys() {
+        const now = new Date();
+        const dateStr = getYYYYMMDD(now);
+        const start = getHHMM(now);
+        const max = 12; // show next 12 departures
+        const url = `/api/journeys?date=${dateStr}&from=oa&to=un&start=${start}&max=${max}`;
+
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
           document.getElementById('loading').style.display = 'none';
           const departuresDiv = document.getElementById('departures');
           departuresDiv.innerHTML = '';
 
-          // Check for SchJourneys and Services
           if (
             !data ||
             !data.SchJourneys ||
@@ -42,13 +85,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
 
-          // Build a semantic table for departures so styling is controlled via CSS
+          // table with Status column
           const table = document.createElement('table');
           table.id = 'departuresTable';
-
           const thead = table.createTHead();
           const headerRow = thead.insertRow();
-          ['Trip', 'Departure', 'From', 'Arrival', 'To', 'Duration'].forEach(h => {
+          ['Trip', 'Departure', 'Status', 'From', 'Arrival', 'To', 'Duration'].forEach(h => {
             const th = document.createElement('th');
             th.textContent = h;
             headerRow.appendChild(th);
@@ -80,6 +122,40 @@ document.addEventListener('DOMContentLoaded', () => {
               tdDep.appendChild(depSpan);
               tr.appendChild(tdDep);
 
+              // status/delay detection
+              const tdStatus = document.createElement('td');
+              let statusText = 'On time';
+              let statusClass = 'status-on';
+
+              // Detect cancellation
+              if (trip?.Cancelled || trip?.IsCancelled || service?.Cancelled) {
+                statusText = 'Cancelled';
+                statusClass = 'status-cancelled';
+              } else {
+                // try to find actual/estimated time fields
+                const actual = departStop?.AdjustedTime || departStop?.EstimatedTime || departStop?.ActualTime || departStop?.TimeRT || departStop?.Realtime || departStop?.RealtimeEstimated;
+                const scheduled = departStop?.Time;
+                const delay = computeDelayMinutes(scheduled, actual);
+                if (delay !== null) {
+                  if (delay > 0) {
+                    statusText = `Delayed ${delay}m`;
+                    statusClass = 'status-delayed';
+                  } else if (delay < 0) {
+                    statusText = `Early ${Math.abs(delay)}m`;
+                    statusClass = 'status-early';
+                  } else {
+                    statusText = 'On time';
+                    statusClass = 'status-on';
+                  }
+                } else if (trip?.Status) {
+                  statusText = trip.Status;
+                }
+              }
+
+              tdStatus.textContent = statusText;
+              tdStatus.className = statusClass;
+              tr.appendChild(tdStatus);
+
               const tdFrom = document.createElement('td');
               tdFrom.textContent = departName;
               tr.appendChild(tdFrom);
@@ -104,11 +180,15 @@ document.addEventListener('DOMContentLoaded', () => {
           });
 
           departuresDiv.appendChild(table);
-        })
-        .catch(err => {
+        } catch (err) {
           document.getElementById('loading').textContent = 'Error loading departures.';
           console.error('Error fetching journey data:', err);
-        });
+        }
+      }
+
+      // initial fetch and poll every 60 seconds
+      fetchAndRenderJourneys();
+      setInterval(fetchAndRenderJourneys, 60 * 1000);
     })
     .catch(err => {
       document.getElementById('loading').textContent = 'Error loading stops.';

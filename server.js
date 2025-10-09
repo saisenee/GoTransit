@@ -1,10 +1,15 @@
-
 const express = require('express'); 
 const path = require('path');
 
 const app = express();
 const PORT = 3000;
 const apiKey = '30025820'; // my API key
+
+// Serve static files from /public folder (useful when running Node locally, optional on Vercel).
+app.use(express.static('public'))
+// Define index.html as the root explicitly (useful on Vercel, optional when running Node locally).
+app.get('/', (req, res) => { res.redirect('/index.html') })
+
 // API endpoint to proxy Metrolinx stops data
 app.get('/api/stops', async (req, res) => {
   const url = `https://api.openmetrolinx.com/OpenDataAPI/api/V1/Stop/All?key=${apiKey}`;
@@ -41,29 +46,19 @@ app.get('/api/journeys', async (req, res) => {
 });
 
 // Serve static files (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname, 'public')));
+// Development: prevent caching of static assets so changes appear immediately in the browser
+app.use((req, res, next) => {
+  // Only set no-store for common static asset extensions
+  if (req.url.match(/\.(css|js|html|png|jpg|jpeg|svg|ico)$/i)) {
+    res.setHeader('Cache-Control', 'no-store');
+    console.log(`[no-cache] set no-store for ${req.url}`);
+  }
+  next();
+});
+
+// Serve static files with no max-age (defensive) — caching already disabled via middleware above
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
-
-function updateClock() {
-    const now = new Date();
-    let hours = now.getHours();
-    let minutes = now.getMinutes();
-    let seconds = now.getSeconds();
-
-    // Pad single-digit numbers with a leading zero
-    hours = hours < 10 ? '0' + hours : hours;
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    seconds = seconds < 10 ? '0' + seconds : seconds;
-
-    const timeString = `${hours}:${minutes}:${seconds}`;
-    document.getElementById('liveClock').innerHTML = timeString;
-}
-
-// Call updateClock initially to display the time immediately
-updateClock();
-
-// Update the clock every second
-setInterval(updateClock, 1000);

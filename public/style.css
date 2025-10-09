@@ -126,6 +126,12 @@ header{
 .time-depart { color: #b7f3b7; font-weight: 700; }
 .time-arrive { color: #b7d2ff; font-weight: 700; }
 
+/* Status styles */
+.status-on { color: #b7f3b7; font-weight: 700; }
+.status-delayed { color: #ffd1d1; background: rgba(255,50,50,0.04); font-weight: 800; }
+.status-early { color: #d1ffd6; font-weight: 700; }
+.status-cancelled { color: #ffb3b3; text-decoration: line-through; font-weight: 800; }
+
 /* zebra rows */
 #departuresTable tbody tr:nth-child(odd) { background: rgba(255,255,255,0.01); }
 #departuresTable tbody tr:hover { background: rgba(255,255,255,0.03); }
