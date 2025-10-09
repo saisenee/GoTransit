@@ -45,19 +45,19 @@ app.get('/api/journeys', async (req, res) => {
   }
 });
 
-// Serve static files (HTML, CSS, JS)
-// Development: prevent caching of static assets so changes appear immediately in the browser
-app.use((req, res, next) => {
-  // Only set no-store for common static asset extensions
-  if (req.url.match(/\.(css|js|html|png|jpg|jpeg|svg|ico)$/i)) {
-    res.setHeader('Cache-Control', 'no-store');
-    console.log(`[no-cache] set no-store for ${req.url}`);
-  }
-  next();
-});
+// // Serve static files (HTML, CSS, JS)
+// // Development: prevent caching of static assets so changes appear immediately in the browser
+// app.use((req, res, next) => {
+//   // Only set no-store for common static asset extensions
+//   if (req.url.match(/\.(css|js|html|png|jpg|jpeg|svg|ico)$/i)) {
+//     res.setHeader('Cache-Control', 'no-store');
+//     console.log(`[no-cache] set no-store for ${req.url}`);
+//   }
+//   next();
+// });
 
-// Serve static files with no max-age (defensive) — caching already disabled via middleware above
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
+// // Serve static files with no max-age (defensive) — caching already disabled via middleware above
+// app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
