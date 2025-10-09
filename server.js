@@ -47,4 +47,23 @@ app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
+function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    let seconds = now.getSeconds();
 
+    // Pad single-digit numbers with a leading zero
+    hours = hours < 10 ? '0' + hours : hours;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+
+    const timeString = `${hours}:${minutes}:${seconds}`;
+    document.getElementById('liveClock').innerHTML = timeString;
+}
+
+// Call updateClock initially to display the time immediately
+updateClock();
+
+// Update the clock every second
+setInterval(updateClock, 1000);

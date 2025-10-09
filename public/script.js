@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('loading').textContent = 'Loading...';
 
@@ -22,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Now fetch journeys and display departures
-      fetch('/api/journeys?date=20251009&from=oa&to=un&start=0900&max=5')
+      fetch('/api/journeys?date=20251009&from=oa&to=un&start=0900&max=10')
         .then(res => res.json())
         .then(data => {
           document.getElementById('loading').style.display = 'none';
@@ -43,33 +42,68 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
 
-          const list = document.createElement('ul');
+          // Build a semantic table for departures so styling is controlled via CSS
+          const table = document.createElement('table');
+          table.id = 'departuresTable';
+
+          const thead = table.createTHead();
+          const headerRow = thead.insertRow();
+          ['Trip', 'Departure', 'From', 'Arrival', 'To', 'Duration'].forEach(h => {
+            const th = document.createElement('th');
+            th.textContent = h;
+            headerRow.appendChild(th);
+          });
+
+          const tbody = document.createElement('tbody');
+          table.appendChild(tbody);
 
           data.SchJourneys[0].Services.forEach(service => {
-            // Each service may have multiple trips
             const trips = service.Trips && service.Trips.Trip ? service.Trips.Trip : [];
             trips.forEach(trip => {
-              // Get stops for this trip
               const stops = trip.Stops && trip.Stops.Stop ? trip.Stops.Stop : [];
               const departStop = stops[0];
               const arriveStop = stops[stops.length - 1];
 
-              // Lookup stop names
               const departName = departStop && departStop.Code ? (codeToName[departStop.Code.toUpperCase()] || departStop.Code) : 'N/A';
               const arriveName = arriveStop && arriveStop.Code ? (codeToName[arriveStop.Code.toUpperCase()] || arriveStop.Code) : 'N/A';
 
-              const li = document.createElement('li');
-              li.innerHTML = `
-                <strong>Trip ${trip.Number} (${trip.Display})</strong><br>
-                Departure: <span style="color:green">${departStop?.Time || 'N/A'}</span> from <b>${departName}</b>
-                &rarr; Arrival: <span style="color:blue">${arriveStop?.Time || 'N/A'}</span> at <b>${arriveName}</b>
-                <br>Duration: ${service.Duration}
-              `;
-              list.appendChild(li);
+              const tr = document.createElement('tr');
+
+              const tdTrip = document.createElement('td');
+              tdTrip.innerHTML = `<strong>${trip.Display || ('Trip ' + (trip.Number || ''))}</strong>`;
+              tr.appendChild(tdTrip);
+
+              const tdDep = document.createElement('td');
+              const depSpan = document.createElement('span');
+              depSpan.className = 'time-depart';
+              depSpan.textContent = departStop?.Time || 'N/A';
+              tdDep.appendChild(depSpan);
+              tr.appendChild(tdDep);
+
+              const tdFrom = document.createElement('td');
+              tdFrom.textContent = departName;
+              tr.appendChild(tdFrom);
+
+              const tdArr = document.createElement('td');
+              const arrSpan = document.createElement('span');
+              arrSpan.className = 'time-arrive';
+              arrSpan.textContent = arriveStop?.Time || 'N/A';
+              tdArr.appendChild(arrSpan);
+              tr.appendChild(tdArr);
+
+              const tdTo = document.createElement('td');
+              tdTo.textContent = arriveName;
+              tr.appendChild(tdTo);
+
+              const tdDur = document.createElement('td');
+              tdDur.textContent = service.Duration || '';
+              tr.appendChild(tdDur);
+
+              tbody.appendChild(tr);
             });
           });
 
-          departuresDiv.appendChild(list);
+          departuresDiv.appendChild(table);
         })
         .catch(err => {
           document.getElementById('loading').textContent = 'Error loading departures.';
@@ -80,33 +114,53 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('loading').textContent = 'Error loading stops.';
       console.error('Error fetching stops data:', err);
     });
-});
-  document.getElementById('loading').textContent = 'Loading...';
-document.querySelector('.reddit-sans-body').textContent = 'Loading...';
 
-  fetch('/api/journeys?date=20251002&from=oa&to=un&start=0900&max=5')
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('loading').style.display = 'none';
-      const departuresDiv = document.getElementById('departures');
-      departuresDiv.innerHTML = '';
-      if (!data || !data.journeys || data.journeys.length === 0) {
-        departuresDiv.innerHTML = '<p>No departures found.</p>';
-        return;
-      }
-      const list = document.createElement('ul');
-      data.journeys.forEach(journey => {
-        const depTime = journey.legs[0]?.departureTime || 'Unknown';
-        const arrTime = journey.legs[journey.legs.length - 1]?.arrivalTime || 'Unknown';
-        const route = journey.legs[0]?.routeName || 'Unknown Route';
-        const li = document.createElement('li');
-        li.textContent = `Route: ${route}, Departure: ${depTime}, Arrival: ${arrTime}`;
-        list.appendChild(li);
-      });
-      departuresDiv.appendChild(list);
-    })
-    .catch(err => {
-      document.getElementById('loading').textContent = 'Error loading departures.';
-      console.error('Error fetching journey data:', err);
+  // Live clock: update #liveClock every second with user's local time
+  const liveClockEl = document.getElementById('liveClock');
+  const clockToggle = document.getElementById('clockToggle');
+
+  // Load saved preference ("24" or "12"). Default to 12h.
+  let clockFormat = localStorage.getItem('clockFormat') || '12';
+  function applyToggleState() {
+    if (!clockToggle) return;
+    clockToggle.setAttribute('aria-pressed', clockFormat === '24' ? 'true' : 'false');
+    clockToggle.textContent = clockFormat === '24' ? '24H' : '12H';
+  }
+
+  function formatTime(date) {
+    if (!date) return '';
+    if (clockFormat === '24') {
+      // 24-hour, ensure zero-padded hours: 00-23
+      const hh = String(date.getHours()).padStart(2, '0');
+      const mm = String(date.getMinutes()).padStart(2, '0');
+      const ss = String(date.getSeconds()).padStart(2, '0');
+      return `${hh}:${mm}:${ss}`;
+    } else {
+      // 12-hour w/ AM/PM
+      const opts = { hour: 'numeric', minute: '2-digit', second: '2-digit' };
+      return date.toLocaleTimeString([], opts);
+    }
+  }
+
+  if (clockToggle) {
+    clockToggle.addEventListener('click', () => {
+      clockFormat = clockFormat === '24' ? '12' : '24';
+      localStorage.setItem('clockFormat', clockFormat);
+      applyToggleState();
+      // update immediately
+      if (liveClockEl) liveClockEl.textContent = formatTime(new Date());
     });
-// ...existing code ends here
+  }
+
+  applyToggleState();
+
+  function updateClock() {
+    if (!liveClockEl) return;
+    liveClockEl.textContent = formatTime(new Date());
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+});
+
+// End of script: all fetching handled inside DOMContentLoaded handler above

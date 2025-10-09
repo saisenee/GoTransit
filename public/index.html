@@ -9,18 +9,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
     <title>GO Transit API</title>
 </head>
-<nav>
-    <div id="navgrid">
-    <img id="logo" src="img/GO_Transit_logo.svg" alt="GO Transit Logo" class="logo">
-    <h1 class="reddit-sans-departures">Departures</h1>
-    </div>
-    </div>
-</nav>
+
 <body>
+    <nav id="mainNav">
+            <div id="navgrid">
+                <img id="logo" src="img/GO_Transit_logo.svg" alt="GO Transit Logo" class="logo">
+                <h1 class="reddit-sans-departures">Departures</h1>
+                        <div class="clock-wrap">
+                            <div id="liveClock" aria-hidden="true" title="Local time"></div>
+                            <button id="clockToggle" aria-pressed="false" title="Toggle 24/12 hour format">24H</button>
+                        </div>
+            </div>
+        </nav>
    <p id="loading" class="reddit-sans-body">Loading...</p>
+   <div id="tableGrid">
     <div id="departures"></div>
     <div id="search">
-        <h2 class="reddit-sans-body">Search</h2>
+        <h2 class="reddit-sans-body">Where To?</h2>
         <form id="searchForm">
             <label for="to" class="reddit-sans-body">To:</label>
             <input type="text" id="to" name="to" value="un" required>
@@ -29,6 +34,7 @@
             <label for="max" class="reddit-sans-body">Max Results:</label>
             <button type="submit" class="reddit-sans-body">Search</button>
         </form>
+    </div>
+    <script src="script.js"></script>
 </body>
-<script src="script.js"></script>
 </html>

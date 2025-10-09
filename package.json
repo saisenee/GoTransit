@@ -4,6 +4,7 @@
   "description": "API sourced from Metrolinx @ https://api.openmetrolinx.com/OpenDataAPI/Help/Index/en",
   "main": "node-fetch.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   }, 
   "keywords": [],
