@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Now fetch journeys and display departures
-      fetch('/api/journeys?date=20251002&from=oa&to=un&start=0900&max=5')
+      fetch('/api/journeys?date=20251009&from=oa&to=un&start=0900&max=5')
         .then(res => res.json())
         .then(data => {
           document.getElementById('loading').style.display = 'none';
