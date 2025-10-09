@@ -85,12 +85,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
 
-          // table with Status column
+          // table
           const table = document.createElement('table');
           table.id = 'departuresTable';
           const thead = table.createTHead();
           const headerRow = thead.insertRow();
-          ['Trip', 'Departure', 'Status', 'From', 'Arrival', 'To', 'Duration'].forEach(h => {
+          ['Destination', 'Departure', 'Status', 'Arrival', 'To', 'Duration'].forEach(h => {
             const th = document.createElement('th');
             th.textContent = h;
             headerRow.appendChild(th);
@@ -156,9 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
               tdStatus.className = statusClass;
               tr.appendChild(tdStatus);
 
-              const tdFrom = document.createElement('td');
-              tdFrom.textContent = departName;
-              tr.appendChild(tdFrom);
+              // const tdFrom = document.createElement('td');
+              // tdFrom.textContent = departName;
+              // tr.appendChild(tdFrom);
 
               const tdArr = document.createElement('td');
               const arrSpan = document.createElement('span');
