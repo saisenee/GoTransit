@@ -135,3 +135,57 @@ header{
 /* zebra rows */
 #departuresTable tbody tr:nth-child(odd) { background: rgba(255,255,255,0.01); }
 #departuresTable tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+#stationSelect {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Dropdown content */
+#stationDropdown {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+/* Station panel layout */
+#stationPanel { margin: 8px; }
+#stationLayout { display: flex; gap: 12px; align-items: flex-start; }
+#lineSvgWrap { width: 40px; flex: 0 0 40px; }
+#lineSvgImg { width: 30px; height: auto; display: block; transform-origin: top center; }
+
+/* scale down the inline SVG so its circles align visually with the button list height */
+#inlineLineSvg { width: 30px; display: block; transform-origin: top center; }
+
+/* Adjust the SVG scale — tweak the scaleY value to better line up with your buttons */
+.line-scale-small { transform: scaleY(0.9); }
+.line-scale-medium { transform: scaleY(0.8); }
+.line-scale-tight { transform: scaleY(0.75); }
+
+#stationList { list-style: none; margin: 0; padding: 0; }
+#stationList li { margin: 6px 0; }
+
+.station-btn {
+  display: inline-block;
+  width: 180px;
+  text-align: left;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 6px;
+  color: #fff;
+  background-color: rgba(0,0,0,0.08);
+  cursor: pointer;
+}
+
+.station-btn:focus { outline: 3px solid rgba(255,255,255,0.12); }
+.station-btn.selected { background-color: #ffffff44; color: #fff; font-weight: 700; }
+
+/* When JS sets data attributes on the <circle> elements to indicate selection, use CSS as a fallback for inline SVG interactions */
+svg circle[data-selected="true"] { fill: white !important; stroke: #2A4D28 !important; }

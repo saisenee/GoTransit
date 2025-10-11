@@ -14,7 +14,7 @@
     <nav id="mainNav">
             <div id="navgrid">
                 <img id="logo" src="img/GO_Transit_logo.svg" alt="GO Transit Logo" class="logo">
-                <h1 class="reddit-sans-departures">Departures</h1>
+                <h1 class="reddit-sans-departures">Oakville GO Departures</h1>
                         <div class="clock-wrap">
                             <div id="liveClock" aria-hidden="true" title="Local time"></div>
                             <button id="clockToggle" aria-pressed="false" title="Toggle 24/12 hour format">24H</button>
@@ -25,29 +25,37 @@
    <div id="tableGrid">
     <div id="departures"></div>
     <div id="search">
-        <h2 class="reddit-sans-body">Where To?</h2>
-        <form id="searchForm">
+        <!-- <h2 class="reddit-sans-body">Where To?</h2> -->
+        <!-- <form id="searchForm">
             <label for="to" class="reddit-sans-body">To:</label>
             <input type="text" id="to" name="to" value="un" required>
             <label for="start" class="reddit-sans-body">Start Time (HHMM):</label>
             <input type="text" id="start" name="start" value="0900" required>
             <label for="max" class="reddit-sans-body">Max Results:</label>
             <button type="submit" class="reddit-sans-body">Search</button>
-        </form>
-        <select id="stationSelect" class="reddit-sans-body" aria-label="Select a station">
-            <option value="" disabled selected>Lakeshore West Stops</option>
-           <option value="aldershot">Aldershot</option> 
-            <option value="burlington">Burlington</option>
-            <option value="appleby">Appleby</option>
-            <option value="bronte">Bronte</option>
-            <option value="oakville">Oakville</option>
-            <option value="clarkson">Clarkson</option>
-            <option value="port_credit">Port Credit</option>
-            <option value="long_branch">Long Branch</option>
-            <option value="mimico">Mimico</option>
-            <option value="exhibition">Exhibition</option>
-            <option value="union">Union Station</option>
-        </select>   
+        </form> -->
+        <div id="stationPanel">
+            <h3 class="reddit-sans-body">Lakeshore West Stops</h3>
+            <div id="stationLayout">
+                <div id="lineSvgWrap" aria-hidden="false">
+                    <!-- SVG will also be accessible as an image for layout; script will fetch inline for interaction -->
+                    <img id="lineSvgImg" src="img/linedisplay.svg" alt="Line display"/>
+                </div>
+                <ul id="stationList" class="reddit-sans-body" role="listbox" aria-label="Station list">
+                    <li><button class="station-btn" data-code="aldershot">Aldershot</button></li>
+                    <li><button class="station-btn" data-code="burlington">Burlington</button></li>
+                    <li><button class="station-btn" data-code="appleby">Appleby</button></li>
+                    <li><button class="station-btn" data-code="bronte">Bronte</button></li>
+                    <li><button class="station-btn" data-code="oakville">Oakville</button></li>
+                    <li><button class="station-btn" data-code="clarkson">Clarkson</button></li>
+                    <li><button class="station-btn" data-code="port_credit">Port Credit</button></li>
+                    <li><button class="station-btn" data-code="long_branch">Long Branch</button></li>
+                    <li><button class="station-btn" data-code="mimico">Mimico</button></li>
+                    <li><button class="station-btn" data-code="exhibition">Exhibition</button></li>
+                    <li><button class="station-btn" data-code="union">Union Station</button></li>
+                </ul>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
