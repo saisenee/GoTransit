@@ -189,3 +189,15 @@ header{
 
 /* When JS sets data attributes on the <circle> elements to indicate selection, use CSS as a fallback for inline SVG interactions */
 svg circle[data-selected="true"] { fill: white !important; stroke: #2A4D28 !important; }
+
+.station-current {
+  display: inline-block;
+  width: 180px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border-radius: 6px;
+  font-weight: 700;
+  font-style: italic;
+  pointer-events: none; 
+}

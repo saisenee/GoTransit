@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // helper to update selected station (called from button clicks)
       function setSelectedStation(code) {
+        // do not allow selecting oakville because it is the user's current station
+        if (code === 'oakville') return;
         selectedStationCode = code;
         // update button styles
         document.querySelectorAll('.station-btn').forEach(btn => {
@@ -81,7 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // restore default fill for unselected circles
                 // default colour used in the SVG is #2A4D28 for most circles,
                 // and one circle uses white with stroke — we won't change stroke here.
-                if (c.id === 'port_credit') {
+                // Keep Oakville white at all times
+                if (c.id === 'oakville') {
+                  c.setAttribute('fill', 'white');
+                } else if (c.id === 'port_credit') {
                   // port_credit originally had white fill and a stroke
                   c.setAttribute('fill', 'white');
                 } else {
@@ -137,7 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // map from our data-code to the two-letter Metrolinx API code
       const twoLetterOverrides = {
         // explicit overrides if the simple 'first two letters' rule doesn't match API codes
-        // 'port_credit': 'pc', // example if needed
+        // Bronte should map to 'bo' instead of 'br'
+        'bronte': 'bo',
+        // you can add others here (e.g., 'port_credit': 'pc')
       };
 
       function toApiCode(stationCode) {
