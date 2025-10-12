@@ -79,7 +79,8 @@ header{
   cursor: pointer;
 }
 
-#clockToggle[aria-pressed="true"] {
+/* .pressed indicates 24H mode */
+#clockToggle.pressed {
   background: rgba(255,255,255,0.12);
 }
 
@@ -156,9 +157,13 @@ header{
 
 /* Station panel layout */
 #stationPanel { margin: 8px; }
-#stationLayout { display: flex; gap: 12px; align-items: flex-start; }
+#stationLayout { display: flex; gap: 12px; align-items: stretch; }
 #lineSvgWrap { width: 40px; flex: 0 0 40px; }
-#lineSvgImg { width: 30px; height: auto; display: block; transform-origin: top center; }
+#lineSvgWrap { width: 40px; flex: 0 0 40px; }
+#verticalLine { width: 6px; background: #2A4D28; border-radius: 3px; margin-top: 6px; margin-bottom: 6px; height: 100%; position: relative; z-index: 0; }
+
+/* place station dots above the vertical line visually */
+.station-row { display: flex; align-items: center; gap: 8px; position: relative; z-index: 1; }
 
 /* scale down the inline SVG so its circles align visually with the button list height */
 #inlineLineSvg { width: 30px; display: block; transform-origin: top center; }
@@ -170,6 +175,11 @@ header{
 
 #stationList { list-style: none; margin: 0; padding: 0; }
 #stationList li { margin: 6px 0; }
+
+.station-row { display: flex; align-items: center; gap: 8px; }
+.station-dot { width: 20px; height: 20px; display: inline-block; color: #2A4D28; }
+.station-dot svg { width: 100%; height: 100%; }
+.station-dot.active { color: #ffffff; }
 
 .station-btn {
   display: inline-block;

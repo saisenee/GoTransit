@@ -70,34 +70,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.station-btn').forEach(btn => {
           btn.classList.toggle('selected', btn.dataset.code === code);
         });
-        // update SVG circle visuals (fill white for selected, restore others)
-        try {
-          const svg = document.getElementById('inlineLineSvg');
-          if (svg) {
-            svg.querySelectorAll('circle').forEach(c => {
-              if (c.id === code) {
-                c.setAttribute('data-selected', 'true');
-                c.setAttribute('fill', 'white');
-              } else {
-                c.removeAttribute('data-selected');
-                // restore default fill for unselected circles
-                // default colour used in the SVG is #2A4D28 for most circles,
-                // and one circle uses white with stroke — we won't change stroke here.
-                // Keep Oakville white at all times
-                if (c.id === 'oakville') {
-                  c.setAttribute('fill', 'white');
-                } else if (c.id === 'port_credit') {
-                  // port_credit originally had white fill and a stroke
-                  c.setAttribute('fill', 'white');
-                } else {
-                  c.setAttribute('fill', '#2A4D28');
-                }
-              }
-            });
+        // update small inline SVG dots: toggle .active class to switch color via CSS
+        document.querySelectorAll('#stationList .station-row').forEach(row => {
+          const dot = row.querySelector('.station-dot');
+          const btn = row.querySelector('.station-btn');
+          const label = row.querySelector('.station-current');
+          const rowCode = btn ? btn.dataset.code : (label ? 'oakville' : null);
+          if (!dot || !rowCode) return;
+          if (rowCode === code) {
+            dot.classList.add('active');
+          } else {
+            // Keep Oakville active
+            if (rowCode === 'oakville') dot.classList.add('active');
+            else dot.classList.remove('active');
           }
-        } catch (e) {
-          console.warn('Error updating inline SVG selection', e);
-        }
+        });
+        // no inline SVG to update anymore; small ellipses handle the visual state
       }
 
       // wire station buttons after DOM ready
@@ -112,32 +100,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Inline the SVG so we can modify its elements. Replace <img id="lineSvgImg"> with inline SVG contents
-      async function inlineSvg() {
-        const img = document.getElementById('lineSvgImg');
-        if (!img) return;
-        try {
-          const res = await fetch(img.src);
-          const text = await res.text();
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(text, 'image/svg+xml');
-          const svg = doc.querySelector('svg');
-          if (!svg) return;
-          // give the svg an id for easier selection
-          svg.id = 'inlineLineSvg';
-          // replace image with inline svg
-          img.replaceWith(svg);
-        } catch (e) {
-          console.error('Failed to inline SVG', e);
-        }
-      }
-
-      // initially wire buttons and inline svg
-      inlineSvg().then(() => {
-        wireStationButtons();
-        // set initial selection to union
-        setSelectedStation(selectedStationCode);
+      // initially wire buttons and set initial UI state
+      wireStationButtons();
+      // ensure Oakville dot is active initially
+      document.querySelectorAll('#stationList .station-row').forEach(row => {
+        const dot = row.querySelector('.station-dot');
+        const label = row.querySelector('.station-current');
+        const btn = row.querySelector('.station-btn');
+        const rowCode = btn ? btn.dataset.code : (label ? 'oakville' : null);
+        if (!dot || !rowCode) return;
+        if (rowCode === 'oakville') dot.classList.add('active');
       });
+      // set initial selected station (union remains default)
+      setSelectedStation(selectedStationCode);
 
       // map from our data-code to the two-letter Metrolinx API code
       const twoLetterOverrides = {
@@ -303,7 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let clockFormat = localStorage.getItem('clockFormat') || '12';
   function applyToggleState() {
     if (!clockToggle) return;
-    clockToggle.setAttribute('aria-pressed', clockFormat === '24' ? 'true' : 'false');
+    // use .pressed class for state instead of aria-pressed
+    if (clockFormat === '24') clockToggle.classList.add('pressed'); else clockToggle.classList.remove('pressed');
     clockToggle.textContent = clockFormat === '24' ? '24H' : '12H';
   }
 

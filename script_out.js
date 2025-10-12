@@ -296,7 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let clockFormat = localStorage.getItem('clockFormat') || '12';
   function applyToggleState() {
     if (!clockToggle) return;
-    clockToggle.setAttribute('aria-pressed', clockFormat === '24' ? 'true' : 'false');
+    // use class-based state instead of aria-pressed
+    clockToggle.classList.toggle('pressed', clockFormat === '24');
     clockToggle.textContent = clockFormat === '24' ? '24H' : '12H';
   }
 

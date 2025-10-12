@@ -16,11 +16,17 @@
                 <img id="logo" src="img/GO_Transit_logo.svg" alt="GO Transit Logo" class="logo">
                 <h1 class="reddit-sans-departures">Oakville GO Departures</h1>
                         <div class="clock-wrap">
-                            <div id="liveClock" aria-hidden="true" title="Local time"></div>
-                            <button id="clockToggle" aria-pressed="false" title="Toggle 24/12 hour format">24H</button>
+                            <div id="liveClock" title="Local time"></div>
+                            <button id="clockToggle" title="Toggle 24/12 hour format">24H</button>
                         </div>
             </div>
         </nav>
+            <!-- inline SVG symbols for station dots (use currentColor for easy CSS color control) -->
+            <svg style="display:none">
+            <symbol id="station-dot" viewBox="0 0 21 21">
+                <circle cx="10.1977" cy="10.1977" r="9.1977" fill="currentColor" stroke="#1E1E1E" stroke-width="2" />
+            </symbol>
+        </svg>
    <p id="loading" class="reddit-sans-body">Loading...</p>
    <div id="tableGrid">
     <div id="departures"></div>
@@ -37,21 +43,21 @@
         <div id="stationPanel">
             <h3 class="reddit-sans-body">Lakeshore West Stops</h3>
             <div id="stationLayout">
-                <div id="lineSvgWrap" aria-hidden="false">
-                    <img id="lineSvgImg" src="img/linedisplay2.svg" alt="Line display"/>
+                <div class="line-column">
+                    <div id="verticalLine"></div>
                 </div>
-                <ul id="stationList" class="reddit-sans-body" role="listbox" aria-label="Station list">
-                    <li><button class="station-btn" data-code="aldershot">Aldershot</button></li>
-                    <li><button class="station-btn" data-code="burlington">Burlington</button></li>
-                    <li><button class="station-btn" data-code="appleby">Appleby</button></li>
-                    <li><button class="station-btn" data-code="bronte">Bronte</button></li>
-                    <li><span class="station-current" aria-current="true">Oakville</span></li>
-                    <li><button class="station-btn" data-code="clarkson">Clarkson</button></li>
-                    <li><button class="station-btn" data-code="port_credit">Port Credit</button></li>
-                    <li><button class="station-btn" data-code="long_branch">Long Branch</button></li>
-                    <li><button class="station-btn" data-code="mimico">Mimico</button></li>
-                    <li><button class="station-btn" data-code="exhibition">Exhibition</button></li>
-                    <li><button class="station-btn" data-code="union">Union Station</button></li>
+                <ul id="stationList" class="reddit-sans-body">
+                    <li class="station-row"><svg class="station-dot"><use href="#station-dot"></use></svg><button class="station-btn" data-code="aldershot">Aldershot</button></li>
+                    <li class="station-row"><svg class="station-dot"><use href="#station-dot"></use></svg><button class="station-btn" data-code="burlington">Burlington</button></li>
+                    <li class="station-row"><svg class="station-dot"><use href="#station-dot"></use></svg><button class="station-btn" data-code="appleby">Appleby</button></li>
+                    <li class="station-row"><svg class="station-dot"><use href="#station-dot"></use></svg><button class="station-btn" data-code="bronte">Bronte</button></li>
+                    <li class="station-row"><svg class="station-dot active"><use href="#station-dot"></use></svg><span class="station-current">Oakville</span></li>
+                    <li class="station-row"><svg class="station-dot"><use href="#station-dot"></use></svg><button class="station-btn" data-code="clarkson">Clarkson</button></li>
+                    <li class="station-row"><svg class="station-dot"><use href="#station-dot"></use></svg><button class="station-btn" data-code="port_credit">Port Credit</button></li>
+                    <li class="station-row"><svg class="station-dot"><use href="#station-dot"></use></svg><button class="station-btn" data-code="long_branch">Long Branch</button></li>
+                    <li class="station-row"><svg class="station-dot"><use href="#station-dot"></use></svg><button class="station-btn" data-code="mimico">Mimico</button></li>
+                    <li class="station-row"><svg class="station-dot"><use href="#station-dot"></use></svg><button class="station-btn" data-code="exhibition">Exhibition</button></li>
+                    <li class="station-row"><svg class="station-dot"><use href="#station-dot"></use></svg><button class="station-btn" data-code="union">Union Station</button></li>
                 </ul>
             </div>
         </div>

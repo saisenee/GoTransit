@@ -16,8 +16,8 @@
                 <img id="logo" src="img/GO_Transit_logo.svg" alt="GO Transit Logo" class="logo">
                 <h1 class="reddit-sans-departures">Oakville GO Departures</h1>
                         <div class="clock-wrap">
-                            <div id="liveClock" aria-hidden="true" title="Local time"></div>
-                            <button id="clockToggle" aria-pressed="false" title="Toggle 24/12 hour format">24H</button>
+                            <div id="liveClock" title="Local time"></div>
+                            <button id="clockToggle" title="Toggle 24/12 hour format">24H</button>
                         </div>
             </div>
         </nav>
@@ -37,11 +37,11 @@
         <div id="stationPanel">
             <h3 class="reddit-sans-body">Lakeshore West Stops</h3>
             <div id="stationLayout">
-                <div id="lineSvgWrap" aria-hidden="false">
+                <div id="lineSvgWrap">
                     <!-- SVG will also be accessible as an image for layout; script will fetch inline for interaction -->
                     <img id="lineSvgImg" src="img/linedisplay.svg" alt="Line display"/>
                 </div>
-                <ul id="stationList" class="reddit-sans-body" role="listbox" aria-label="Station list">
+                <ul id="stationList" class="reddit-sans-body">
                     <li><button class="station-btn" data-code="aldershot">Aldershot</button></li>
                     <li><button class="station-btn" data-code="burlington">Burlington</button></li>
                     <li><button class="station-btn" data-code="appleby">Appleby</button></li>
