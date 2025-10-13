@@ -1,0 +1,1782 @@
+Copilot Log 1/2 Evan Saisenesouk 
+
+saisenee: @vscode how can I connect this to node js
+
+VS Code: To run this code with Node.js, you need to ensure that:
+
+1. Node.js is installed on your system.
+2. The node-fetch package is installed in your project.
+
+Here are the steps:
+
+1. Open the integrated terminal in Visual Studio Code using the keybinding ``ctrl + ` `` (the command is **Toggle Integrated Terminal**).
+2. Run npm init -y in your project folder to create a package.json file if you don't have one.
+3. Install node-fetch by running npm install node-fetch in the terminal.
+4. Run your script with node node-fetch.js in the terminal.
+
+
+
+Show in Command Palette
+
+saisenee: PS C:\Users\evans\OneDrive\Documents\GitHub\GOTransitAPI> npm -y
+npm : The term 'npm' is not recognized as the name of a cmdlet, 
+function, script file, or operable program. Check the spelling of the 
+name, or if a path was included, verify that the path is correct and 
+try again.
+At line:1 char:1
++ npm -y
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (npm:String) [], Comman 
+   dNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+GitHub Copilot: This error means Node.js (and npm) is not installed or not added to your system PATH.
+
+**To fix:**
+
+1. Download and install Node.js from [https://nodejs.org/](https://nodejs.org/).
+2. During installation, ensure the option to add Node.js to PATH is checked.
+3. After installation, restart your terminal (or VS Code).
+4. Verify installation by running:
+   ```
+   node -v
+   npm -v
+   ```
+   Both should print version numbers.
+
+Then you can run:
+```
+npm init -y
+npm install node-fetch
+node node-fetch.js
+```
+
+saisenee: PS C:\Users\evans\OneDrive\Documents\GitHub\GOTransitAPI> node -v
+v22.20.0
+PS C:\Users\evans\OneDrive\Documents\GitHub\GOTransitAPI> npm -v
+npm : File C:\Program Files\nodejs\npm.ps1 cannot be loaded because 
+running scripts is disabled on this system. For more information, see 
+about_Execution_Policies at 
+https:/go.microsoft.com/fwlink/?LinkID=135170.
+At line:1 char:1
++ npm -v
++ ~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityExcepti  
+   on
+    + FullyQualifiedErrorId : UnauthorizedAccess
+
+GitHub Copilot: This error is caused by PowerShell's script execution policy blocking npm.  
+You have two options:
+
+### **Option 1: Use Command Prompt**
+- Open **Command Prompt** (search for "cmd" in the Start menu).
+- Run your npm commands there:
+  ```
+  npm init -y
+  npm install node-fetch
+  ```
+
+### **Option 2: Change PowerShell Execution Policy**
+- Open PowerShell **as Administrator**.
+- Run:
+  ```
+  Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+  ```
+- Type `Y` to confirm.
+- Restart your PowerShell or VS Code terminal.
+
+Now you can use npm commands in PowerShell.  
+**Using Command Prompt is usually easier and safer for beginners.**
+
+saisenee: PS C:\Users\evans\OneDrive\Documents\GitHub\GOTransitAPI> Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+
+GitHub Copilot: Great! You have now set the execution policy, so npm should work in PowerShell.
+
+**Next steps:**
+
+1. In your terminal, run:
+   ```
+   npm init -y
+   npm install node-fetch
+   ```
+2. Then, run your Node.js script:
+   ```
+   node node-fetch.js
+   ```
+
+If you want to display the API data in your index.html, you’ll need to create an API endpoint in Node.js (using Express, for example) and fetch from it in your script.js. Let me know if you want help with that!
+
+saisenee: yes please
+
+GitHub Copilot: To connect your Node.js backend to your HTML frontend, you should:
+
+1. **Create a simple Express server** that fetches data from the Metrolinx API and serves it at a local endpoint (e.g., `/api/vehicles`).
+2. **Fetch that endpoint from your script.js** in the browser.
+
+Here’s how you can do it:
+
+---
+
+### 1. Install Express
+
+In your terminal, run:
+```
+npm install express
+```
+
+---
+
+### 2. Create `server.js`
+
+Add this file to your project:
+
+````javascript
+const express = require('express');
+const fetch = require('node-fetch');
+const path = require('path');
+
+const app = express();
+const PORT = 3000;
+
+const apiURL = 'https://api.openmetrolinx.com/OpenDataAPI/api/V1/Gtfs/Feed/VehiclePosition';
+const apiKey = '30025820'; // Replace with your actual API key if needed
+
+// Serve static files (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname)));
+
+// API endpoint to proxy Metrolinx data
+app.get('/api/vehicles', async (req, res) => {
+  try {
+    const response = await fetch(apiURL, {
+      headers: { 'x-api-key': apiKey }
+    });
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'API error' });
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+````
+
+---
+
+### 3. Update script.js to fetch from your backend
+
+Replace the contents of script.js with:
+
+````javascript
+fetch('/api/vehicles')
+  .then(res => res.json())
+  .then(data => {
+    console.log('Vehicle data:', data);
+    // You can now update the DOM with this data
+  })
+  .catch(err => {
+    console.error('Error fetching vehicle data:', err);
+  });
+````
+
+---
+
+### 4. Start your server
+
+In your terminal, run:
+```
+node server.js
+```
+
+Then open [http://localhost:3000](http://localhost:3000) in your browser.  
+Your frontend will now fetch live data from your Node.js backend!
+
+Let me know if you want help displaying the data on your page.
+
+saisenee: How can I display the departures on the page
+
+GitHub Copilot: To display departures on your page, you need to:
+
+1. **Update your script.js** to fetch the data and update the DOM.
+2. **Add a container in your HTML** for the departures list.
+
+---
+
+### 1. Update index.html
+
+Add a container (e.g., a `<div id="departures"></div>`) inside the `<body>` where the departures will be shown:
+
+````html
+<body>
+   <p class="reddit-sans-body" id="loading">Loading...</p>
+   <div id="departures"></div>
+</body>
+````
+
+---
+
+### 2. Update script.js
+
+Fetch the data and display it in the `#departures` div.  
+Here’s an example that lists each vehicle’s trip and position (customize as needed):
+
+````javascript
+fetch('/api/vehicles')
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('loading').style.display = 'none';
+    const departuresDiv = document.getElementById('departures');
+    if (!data || !data.entity || data.entity.length === 0) {
+      departuresDiv.innerHTML = '<p>No departures found.</p>';
+      return;
+    }
+    const list = document.createElement('ul');
+    data.entity.forEach(vehicle => {
+      const trip = vehicle.vehicle?.trip?.tripId || 'Unknown Trip';
+      const route = vehicle.vehicle?.trip?.routeId || 'Unknown Route';
+      const status = vehicle.vehicle?.currentStatus || 'Unknown Status';
+      const li = document.createElement('li');
+      li.textContent = `Trip: ${trip}, Route: ${route}, Status: ${status}`;
+      list.appendChild(li);
+    });
+    departuresDiv.appendChild(list);
+  })
+  .catch(err => {
+    document.getElementById('loading').textContent = 'Error loading departures.';
+    console.error('Error fetching vehicle data:', err);
+  });
+````
+
+---
+
+Now, when you load the page, it will show a list of departures from the API.  
+You can further style or format the output as you like!
+
+saisenee: Lets integrate this from the metrolinx api 
+
+GET api/V1/Schedule/Journey/{Date}/{FromStopCode}/{ToStopCode}/{StartTime}/{MaxJourney}
+
+GitHub Copilot: To integrate the Metrolinx API endpoint  
+`GET api/V1/Schedule/Journey/{Date}/{FromStopCode}/{ToStopCode}/{StartTime}/{MaxJourney}`  
+and display departures on your page, follow these steps:
+
+---
+
+### 1. **Update your backend (server.js) to proxy this endpoint**
+
+Add a new route to your Express server to fetch journeys:
+
+````javascript
+// ...existing code...
+const apiKey = '25820'; // Replace with your actual API key if needed
+
+// ...existing code...
+
+// New endpoint to get journeys
+app.get('/api/journeys', async (req, res) => {
+  const { date, from, to, start, max } = req.query;
+  if (!date || !from || !to || !start || !max) {
+    return res.status(400).json({ error: 'Missing required query parameters.' });
+  }
+  const url = `https://api.openmetrolinx.com/OpenDataAPI/api/V1/Schedule/Journey/${date}/${from}/${to}/${start}/${max}`;
+  try {
+    const response = await fetch(url, {
+      headers: { 'x-api-key': apiKey }
+    });
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'API error' });
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+// ...existing code...
+````
+
+---
+
+### 2. **Update your frontend (script.js) to fetch journeys**
+
+Replace or update your script.js with the following code.  
+This example fetches journeys for a specific date, from stop, to stop, start time, and max journeys.  
+**Replace the sample values with your desired stop codes and times.**
+
+````javascript
+document.querySelector('.reddit-sans-body').textContent = 'Loading...';
+
+// Example parameters (replace with your own or make dynamic)
+const date = '2025-10-02'; // YYYY-MM-DD
+const fromStop = 'THGO';   // Example: Union Station
+const toStop = 'ERGO';     // Example: Erindale GO
+const startTime = '08:00'; // HH:mm (24-hour)
+const maxJourney = 5;
+
+fetch(`/api/journeys?date=${date}&from=${fromStop}&to=${toStop}&start=${startTime}&max=${maxJourney}`)
+  .then(res => res.json())
+  .then(data => {
+    document.querySelector('.reddit-sans-body').style.display = 'none';
+    const departuresDiv = document.getElementById('departures');
+    departuresDiv.innerHTML = '';
+    if (!data || !data.journeys || data.journeys.length === 0) {
+      departuresDiv.innerHTML = '<p>No departures found.</p>';
+      return;
+    }
+    const list = document.createElement('ul');
+    data.journeys.forEach(journey => {
+      const depTime = journey.legs[0]?.departureTime || 'Unknown';
+      const arrTime = journey.legs[journey.legs.length - 1]?.arrivalTime || 'Unknown';
+      const route = journey.legs[0]?.routeName || 'Unknown Route';
+      const li = document.createElement('li');
+      li.textContent = `Route: ${route}, Departure: ${depTime}, Arrival: ${arrTime}`;
+      list.appendChild(li);
+    });
+    departuresDiv.appendChild(list);
+  })
+  .catch(err => {
+    document.querySelector('.reddit-sans-body').textContent = 'Error loading departures.';
+    console.error('Error fetching journey data:', err);
+  });
+````
+
+---
+
+### 3. **Restart your server**
+
+After making changes to server.js, restart your Node.js server:
+```
+node server.js
+```
+
+---
+
+### 4. **Reload your page**
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.  
+You should see a list of departures between your chosen stops.
+
+---
+
+**Tip:**  
+You can make the parameters dynamic (e.g., via a form) for user selection.  
+Let me know if you want help with that!
+
+saisenee: URI Parameters
+Name	Description	Type	Additional Information
+Date	
+Date of journey (yyyymmdd)
+
+string	
+Default value is
+
+FromStopCode	
+Departure stop
+
+string	
+Default value is
+
+ToStopCode	
+Destination stop
+
+string	
+Default value is
+
+StartTime	
+Time of day (e.g., 0900 means 9:00 am)
+
+string	
+Default value is
+
+MaxJourney	
+Maximum number of Journeys to return (defaults to 3)
+
+string	
+Default value is 3
+
+GitHub Copilot: Here’s how to add the `/api/journeys` endpoint to your server.js to proxy the Metrolinx journey API:
+
+````javascript
+// ...existing code...
+
+// API endpoint to proxy Metrolinx journey data
+app.get('/api/journeys', async (req, res) => {
+  const { date, from, to, start, max } = req.query;
+  if (!date || !from || !to || !start || !max) {
+    return res.status(400).json({ error: 'Missing required query parameters.' });
+  }
+  const url = `https://api.openmetrolinx.com/OpenDataAPI/api/V1/Schedule/Journey/${date}/${from}/${to}/${start}/${max}`;
+  try {
+    const response = await fetch(url, {
+      headers: { 'x-api-key': apiKey }
+    });
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'API error' });
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ...existing code...
+````
+
+**How to use:**  
+Now you can call `/api/journeys?date=20251002&from=THGO&to=ERGO&start=0900&max=3` from your frontend.  
+Let me know if you want the frontend code to display these journeys!
+
+saisenee: Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+script.js:22 Uncaught (in promise) TypeError: Cannot set properties of null (setting 'textContent')
+    at script.js:22:52Understand this error
+init.js:45 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'offsetX')
+    at applyCursorStyle (init.js:45:51)
+    at initCursorStyleOnLoad (web.js:309:9)
+    at web.js:228:5Understand this error
+___vscode_livepreview_injected_script:36 WebSocket connection to 'ws://127.0.0.1:3001/7fb0a4a4b434b14306c320041018e3d4bb3d416e' failed: 
+onLoad @ ___vscode_livepreview_injected_script:36Understand this error
+:3000/favicon.ico:1  Failed to load resource: the server responded with a status of 404 (Not Found)
+
+GitHub Copilot: Here’s what your errors mean and how to fix them:
+
+---
+
+### 1. **Cannot set properties of null (setting 'textContent')**
+
+**Cause:**  
+Your script.js is trying to access an element with the class `.reddit-sans-body`, but in your HTML, it’s a `<p>` tag, not a unique ID.  
+If you have multiple elements with this class, `document.querySelector('.reddit-sans-body')` will only select the first one, but if it doesn't exist, it returns `null`.
+
+**Fix:**  
+Make sure your `<p>` tag exists and is loaded before your script runs.  
+Also, in your HTML, you have:
+```html
+<p class="reddit-sans-body">Loading...</p>
+<div class="departures"></div>
+```
+But in your script, you use `getElementById('departures')`, but your div has a class, not an id.
+
+**Update your HTML:**
+````html
+<!-- ...existing code... -->
+<body>
+   <p class="reddit-sans-body" id="loading">Loading...</p>
+   <div id="departures"></div>
+</body>
+<!-- ...existing code... -->
+````
+
+**Update your script.js to use these IDs:**
+````javascript
+document.getElementById('loading').textContent = 'Loading...';
+// ...existing code...
+const departuresDiv = document.getElementById('departures');
+// ...existing code...
+document.getElementById('loading').style.display = 'none';
+// ...existing code...
+document.getElementById('loading').textContent = 'Error loading departures.';
+// ...existing code...
+````
+
+---
+
+### 2. **404 Not Found for script.js or favicon.ico**
+
+**Cause:**  
+- The browser can’t find script.js or `favicon.ico` in your project root.
+- Make sure script.js exists in your project folder.
+- The favicon warning is harmless unless you want a custom favicon.
+
+**Fix:**  
+- Ensure script.js is in the same directory as index.html.
+- To remove the favicon error, add a favicon or ignore the warning.
+
+---
+
+### 3. **WebSocket connection failed**
+
+**Cause:**  
+This is from VS Code Live Preview or a similar extension. It’s not related to your app and can be ignored unless you need Live Preview features.
+
+---
+
+**Summary of fixes:**
+- Use `id="departures"` and `id="loading"` in your HTML.
+- Use `getElementById` in your JS.
+- Make sure script.js is present in your project folder.
+
+Let me know if you want the corrected script.js code!
+
+saisenee: Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+init.js:45 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'offsetX')
+    at applyCursorStyle (init.js:45:51)
+    at initCursorStyleOnLoad (web.js:309:9)
+    at web.js:228:5Understand this error
+___vscode_livepreview_injected_script:36 WebSocket connection to 'ws://127.0.0.1:3001/7fb0a4a4b434b14306c320041018e3d4bb3d416e' failed: 
+onLoad @ ___vscode_livepreview_injected_script:36Understand this error
+script.js:22 Uncaught (in promise) TypeError: Cannot set properties of null (setting 'textContent')
+    at script.js:22:52
+
+GitHub Copilot: Here’s how to fix your errors:
+
+---
+
+### 1. **Cannot set properties of null (setting 'textContent')**
+
+**Problem:**  
+Your script is trying to access an element that doesn’t exist or is missing an `id`.
+
+**Solution:**  
+Add an `id="loading"` to your loading paragraph in index.html:
+
+````html
+<!-- ...existing code... -->
+<body>
+   <p class="reddit-sans-body" id="loading">Loading...</p>
+   <div id="departures"></div>
+</body>
+<!-- ...existing code... -->
+````
+
+---
+
+### 2. **Update your script.js to use the correct IDs**
+
+Make sure your JS uses `getElementById('loading')` and `getElementById('departures')`:
+
+````javascript
+document.getElementById('loading').textContent = 'Loading...';
+
+// ...your fetch and display code...
+
+// Example:
+fetch('/api/journeys?date=20251002&from=THGO&to=ERGO&start=0900&max=3')
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('loading').style.display = 'none';
+    const departuresDiv = document.getElementById('departures');
+    departuresDiv.innerHTML = '';
+    if (!data || !data.journeys || data.journeys.length === 0) {
+      departuresDiv.innerHTML = '<p>No departures found.</p>';
+      return;
+    }
+    const list = document.createElement('ul');
+    data.journeys.forEach(journey => {
+      const depTime = journey.legs[0]?.departureTime || 'Unknown';
+      const arrTime = journey.legs[journey.legs.length - 1]?.arrivalTime || 'Unknown';
+      const route = journey.legs[0]?.routeName || 'Unknown Route';
+      const li = document.createElement('li');
+      li.textContent = `Route: ${route}, Departure: ${depTime}, Arrival: ${arrTime}`;
+      list.appendChild(li);
+    });
+    departuresDiv.appendChild(list);
+  })
+  .catch(err => {
+    document.getElementById('loading').textContent = 'Error loading departures.';
+    console.error('Error fetching journey data:', err);
+  });
+````
+
+---
+
+### 3. **404 for favicon.ico**
+
+This is harmless unless you want a favicon. You can ignore it or add a favicon to your project.
+
+---
+
+### 4. **init.js and WebSocket errors**
+
+These are from VS Code Live Preview or other extensions and can be ignored for your app’s functionality.
+
+---
+
+**Summary:**  
+- Add `id="loading"` to your `<p>`.
+- Use `getElementById` in your JS.
+- Ignore favicon and WebSocket errors unless you want to address them.
+
+Let me know if you want the full, corrected script.js!
+
+saisenee: script.js:1 Uncaught TypeError: Cannot set properties of null (setting 'textContent')
+    at script.js:1:48Understand this error
+___vscode_livepreview_injected_script:36 WebSocket connection to 'ws://127.0.0.1:3001/7fb0a4a4b434b14306c320041018e3d4bb3d416e' failed: 
+onLoad @ ___vscode_livepreview_injected_script:36Understand this error
+init.js:45 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'offsetX')
+    at applyCursorStyle (init.js:45:51)
+    at initCursorStyleOnLoad (web.js:309:9)
+    at web.js:228:5
+
+GitHub Copilot: The error  
+```
+Uncaught TypeError: Cannot set properties of null (setting 'textContent')
+```
+means your script is running before the DOM is ready, so `document.getElementById('loading')` is `null`.
+
+**How to fix:**  
+Wrap your code in a `DOMContentLoaded` event listener to ensure the DOM is loaded before your script runs.
+
+Update your script.js like this:
+
+````javascript
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('loading').textContent = 'Loading...';
+
+  fetch('/api/journeys?date=20251002&from=THGO&to=ERGO&start=0900&max=3')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('loading').style.display = 'none';
+      const departuresDiv = document.getElementById('departures');
+      departuresDiv.innerHTML = '';
+      if (!data || !data.journeys || data.journeys.length === 0) {
+        departuresDiv.innerHTML = '<p>No departures found.</p>';
+        return;
+      }
+      const list = document.createElement('ul');
+      data.journeys.forEach(journey => {
+        const depTime = journey.legs[0]?.departureTime || 'Unknown';
+        const arrTime = journey.legs[journey.legs.length - 1]?.arrivalTime || 'Unknown';
+        const route = journey.legs[0]?.routeName || 'Unknown Route';
+        const li = document.createElement('li');
+        li.textContent = `Route: ${route}, Departure: ${depTime}, Arrival: ${arrTime}`;
+        list.appendChild(li);
+      });
+      departuresDiv.appendChild(list);
+    })
+    .catch(err => {
+      document.getElementById('loading').textContent = 'Error loading departures.';
+      console.error('Error fetching journey data:', err);
+    });
+});
+````
+
+This will resolve the `null` error.  
+The other errors (WebSocket, favicon) are not critical for your app.
+
+saisenee: Uncaught TypeError: Cannot set properties of null (setting 'textContent')
+    at HTMLDocument.<anonymous> (script.js:2:50)Understand this error
+___vscode_livepreview_injected_script:36 WebSocket connection to 'ws://127.0.0.1:3001/7fb0a4a4b434b14306c320041018e3d4bb3d416e' failed: 
+onLoad @ ___vscode_livepreview_injected_script:36Understand this error
+init.js:45 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'offsetX')
+    at applyCursorStyle (init.js:45:51)
+    at initCursorStyleOnLoad (web.js:309:9)
+    at web.js:228:5Understand this error
+3(index):1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+
+GitHub Copilot: The error  
+```
+Uncaught TypeError: Cannot set properties of null (setting 'textContent')
+```
+means that `document.getElementById('loading')` is returning `null`.  
+This happens if there is **no element with `id="loading"` in your HTML**.
+
+---
+
+### **How to Fix**
+
+**Update your index.html so your loading paragraph has `id="loading"`:**
+
+````html
+<body>
+   <p class="reddit-sans-body" id="loading">Loading...</p>
+   <div id="departures"></div>
+</body>
+````
+
+---
+
+**Summary:**  
+- Make sure your `<p>` tag has `id="loading"` (not just a class).
+- Your script will then find the element and the error will disappear.
+
+Let me know if you need more help!
+
+saisenee: :3000/api/journeys?date=20251002&from=THGO&to=ERGO&start=0900&max=3:1  Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+___vscode_livepreview_injected_script:36 WebSocket connection to 'ws://127.0.0.1:3001/7fb0a4a4b434b14306c320041018e3d4bb3d416e' failed: 
+onLoad @ ___vscode_livepreview_injected_script:36Understand this error
+script.js:27 Error fetching journey data: SyntaxError: Unexpected token '<', "
+		<!DOCTYPE "... is not valid JSON
+(anonymous) @ script.js:27Understand this error
+init.js:45 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'offsetX')
+    at applyCursorStyle (init.js:45:51)
+    at initCursorStyleOnLoad (web.js:309:9)
+    at web.js:228:5
+
+GitHub Copilot: Here’s what’s happening:
+
+### 1. **404 Not Found for `/api/journeys`**
+- Your browser is requesting `/api/journeys?date=20251002&from=THGO&to=ERGO&start=0900&max=3`
+- The server responds with a 404, meaning **the route does not exist** or is not set up correctly.
+
+### 2. **SyntaxError: Unexpected token '<', ... is not valid JSON**
+- This happens because the server is returning an HTML error page (probably a 404 page), not JSON.
+- Your JS tries to parse it as JSON, causing the error.
+
+---
+
+## **How to Fix**
+
+### **A. Make sure your `/api/journeys` endpoint exists in server.js**
+
+Your server.js should have this route:
+
+````javascript
+// ...existing code...
+
+app.get('/api/journeys', async (req, res) => {
+  const { date, from, to, start, max } = req.query;
+  if (!date || !from || !to || !start || !max) {
+    return res.status(400).json({ error: 'Missing required query parameters.' });
+  }
+  const url = `https://api.openmetrolinx.com/OpenDataAPI/api/V1/Schedule/Journey/${date}/${from}/${to}/${start}/${max}`;
+  try {
+    const response = await fetch(url, {
+      headers: { 'x-api-key': apiKey }
+    });
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'API error' });
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ...existing code...
+````
+
+**If you don’t have this, add it and restart your server!**
+
+---
+
+### **B. Restart your Node.js server**
+After making changes to server.js, always restart your server:
+```
+node server.js
+```
+
+---
+
+### **C. Double-check your API key and parameters**
+- Make sure your API key is valid.
+- Make sure you are using the correct stop codes (not names). For example, `THGO` for Union, `ERGO` for Erindale, etc.
+
+---
+
+### **D. Test the endpoint directly**
+Try visiting [http://localhost:3000/api/journeys?date=20251002&from=THGO&to=ERGO&start=0900&max=3](http://localhost:3000/api/journeys?date=20251002&from=THGO&to=ERGO&start=0900&max=3) in your browser.  
+You should see JSON, not an error page.
+
+---
+
+**Summary:**  
+- Add the `/api/journeys` route to your server.
+- Restart your server.
+- Use correct stop codes.
+- Test the endpoint directly.
+
+Let me know if you need help updating your server.js!
+
+saisenee: Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+___vscode_livepreview_injected_script:36 WebSocket connection to 'ws://127.0.0.1:3001/7fb0a4a4b434b14306c320041018e3d4bb3d416e' failed: 
+onLoad @ ___vscode_livepreview_injected_script:36Understand this error
+script.js:27 Error fetching journey data: SyntaxError: Unexpected token '<', "
+		<!DOCTYPE "... is not valid JSON
+(anonymous) @ script.js:27Understand this error
+init.js:45 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'offsetX')
+    at applyCursorStyle (init.js:45:51)
+    at initCursorStyleOnLoad (web.js:309:9)
+    at web.js:228:5
+
+GitHub Copilot: You have **frontend code at the bottom of your server.js**. This is causing problems.
+
+**Node.js server files should not contain any DOM or browser code** like `document.querySelector` or `fetch('/api/journeys?...')`.  
+That code belongs in your script.js (which runs in the browser), not in server.js (which runs on the server).
+
+---
+
+## **How to Fix**
+
+### 1. **Remove all frontend/browser code from server.js**
+
+Delete everything from this line onward in server.js:
+```js
+document.querySelector('.reddit-sans-body').textContent = 'Loading...';
+// ...and everything after...
+```
+
+Your server.js should end like this:
+````javascript
+// ...existing code...
+
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+````
+
+---
+
+### 2. **Put all browser/DOM code in script.js only**
+
+Your script.js is already correct (from your previous message).
+
+---
+
+### 3. **Restart your Node.js server**
+
+After saving changes, restart your server:
+```
+node server.js
+```
+
+---
+
+### 4. **Reload your browser**
+
+Now your `/api/journeys` endpoint should work, and your frontend should not throw JSON or DOM errors.
+
+---
+
+**Summary:**  
+- Only server code in server.js.  
+- Only browser code in script.js.  
+- Restart your server after changes.
+
+Let me know if you need more help!
+
+saisenee: script.js:5  GET http://localhost:3000/api/journeys?date=20251002&from=THGO&to=ERGO&start=0900&max=3 404 (Not Found)
+(anonymous) @ script.js:5Understand this error
+___vscode_livepreview_injected_script:36 WebSocket connection to 'ws://127.0.0.1:3001/7fb0a4a4b434b14306c320041018e3d4bb3d416e' failed: 
+onLoad @ ___vscode_livepreview_injected_script:36
+(anonymous) @ ___vscode_livepreview_injected_script:17Understand this error
+script.js:28 Error fetching journey data: SyntaxError: Unexpected token '<', "
+		<!DOCTYPE "... is not valid JSON
+(anonymous) @ script.js:28
+Promise.catch
+(anonymous) @ script.js:26Understand this error
+init.js:45 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'offsetX')
+    at applyCursorStyle (init.js:45:51)
+    at initCursorStyleOnLoad (web.js:309:9)
+    at web.js:228:5
+
+GitHub Copilot: Here’s what’s happening:
+
+### 1. **404 Not Found for `/api/journeys`**
+- Your browser is requesting `http://localhost:3000/api/journeys?date=20251002&from=THGO&to=ERGO&start=0900&max=3`
+- The server responds with a 404, meaning the route does not exist or is not being matched.
+
+### 2. **SyntaxError: Unexpected token '<', ... is not valid JSON**
+- This happens because the server is returning an HTML error page (probably a 404 page), not JSON.
+- Your JS tries to parse it as JSON, causing the error.
+
+---
+
+## **How to Fix**
+
+### **A. Your server.js is correct**
+Your `/api/journeys` route is set up properly.
+
+### **B. The Problem: `express.static(path.join(__dirname))`**
+This line:
+```js
+app.use(express.static(path.join(__dirname)));
+```
+**serves every file in your project folder as static content.**  
+If a file or folder named `api` exists in your project, it will take precedence over your API route, causing a 404 for `/api/journeys`.
+
+---
+
+### **Solution: Serve static files from a `public` folder only**
+
+1. **Create a `public` folder** in your project root.
+2. **Move your index.html, script.js, style.css, and any images** into the `public` folder.
+3. **Update your server.js static middleware:**
+
+````javascript
+// ...existing code...
+app.use(express.static(path.join(__dirname, 'public')));
+// ...existing code...
+````
+
+4. **Restart your server:**
+   ```
+   node server.js
+   ```
+
+5. **Visit [http://localhost:3000](http://localhost:3000)**
+
+---
+
+### **Summary**
+- Move all frontend files to a `public` folder.
+- Change `express.static` to serve from `public`.
+- Restart your server.
+
+This will fix the 404 and JSON errors for your `/api/journeys` endpoint.
+
+Let me know if you need the exact folder structure or more help!
+
+saisenee: init.js:45 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'offsetX')
+    at applyCursorStyle (init.js:45:51)
+    at initCursorStyleOnLoad (web.js:309:9)
+    at web.js:228:5Understand this error
+(index):1 Access to fetch at 'https://api.openmetrolinx.com/OpenDataAPI/api/V1/Schedule/Journey/20251002/oa/un/0900/5' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+api.openmetrolinx.com/OpenDataAPI/api/V1/Schedule/Journey/20251002/oa/un/0900/5:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+script.js:28 Error fetching journey data: TypeError: Failed to fetch
+    at HTMLDocument.<anonymous> (script.js:5:3)
+
+GitHub Copilot: You are now getting a **CORS error** because your frontend (script.js) is trying to fetch data directly from the Metrolinx API.  
+Browsers block this for security reasons unless the API server allows it (which Metrolinx does not).
+
+---
+
+## **How to Fix**
+
+**You must fetch the data through your Node.js backend, not directly from the browser.**
+
+---
+
+### 1. **Update script.js to use your backend**
+
+Change your fetch URL in script.js from:
+```javascript
+fetch('https://api.openmetrolinx.com/OpenDataAPI/api/V1/Schedule/Journey/20251002/oa/un/0900/5')
+```
+to:
+```javascript
+fetch('/api/journeys?date=20251002&from=oa&to=un&start=0900&max=5')
+```
+
+---
+
+### 2. **Make sure your backend route is correct**
+
+Your server.js should have this route (which you already do):
+
+```javascript
+app.get('/api/journeys', async (req, res) => {
+  const { date, from, to, start, max } = req.query;
+  // ...fetch from Metrolinx and return JSON...
+});
+```
+
+---
+
+### 3. **Folder Structure**
+
+Your index.html, script.js, and style.css should be in a `public` folder.  
+Your server.js should serve static files from `public`:
+
+```javascript
+app.use(express.static(path.join(__dirname, 'public')));
+```
+
+---
+
+### 4. **Restart your server**
+
+After making these changes, restart your Node.js server.
+
+---
+
+## **Summary**
+
+- **Never fetch the Metrolinx API directly from the browser.**
+- **Always use your backend (`/api/journeys`) as a proxy.**
+- **Update your frontend fetch URL to `/api/journeys?...`**
+
+---
+
+Let me know if you want the exact code for your script.js!
+
+saisenee: script.js:5  GET http://localhost:3000/api/journeys?date=20251002&from=oa&to=un&start=0900&max=5 404 (Not Found)
+(anonymous) @ script.js:5Understand this error
+___vscode_livepreview_injected_script:36 WebSocket connection to 'ws://127.0.0.1:3001/7fb0a4a4b434b14306c320041018e3d4bb3d416e' failed: 
+onLoad @ ___vscode_livepreview_injected_script:36
+(anonymous) @ ___vscode_livepreview_injected_script:17Understand this error
+script.js:28 Error fetching journey data: SyntaxError: Unexpected token '<', "
+		<!DOCTYPE "... is not valid JSON
+(anonymous) @ script.js:28
+Promise.catch
+(anonymous) @ script.js:26Understand this error
+init.js:45 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'offsetX')
+    at applyCursorStyle (init.js:45:51)
+    at initCursorStyleOnLoad (web.js:309:9)
+    at web.js:228:5
+
+GitHub Copilot: Your HTML is correct and your static files are in the right place.  
+**The problem is still a 404 on `/api/journeys`.**  
+This means your backend route is not being matched.
+
+---
+
+## **Checklist to Fix the 404**
+
+### 1. **Your server.js must serve static files from public**
+
+Make sure you have:
+```javascript
+app.use(express.static(path.join(__dirname, 'public')));
+```
+
+### 2. **Your `/api/journeys` route must be ABOVE the static middleware**
+
+**Order matters!**  
+Define your API routes **before** `app.use(express.static(...))`.
+
+**Correct order:**
+````javascript
+const express = require('express');
+const fetch = require('node-fetch');
+const path = require('path');
+
+const app = express();
+const PORT = 3000;
+const apiKey = '30025820'; // Your API key
+
+// API endpoint to proxy Metrolinx journey data
+app.get('/api/journeys', async (req, res) => {
+  const { date, from, to, start, max } = req.query;
+  if (!date || !from || !to || !start || !max) {
+    return res.status(400).json({ error: 'Missing required query parameters.' });
+  }
+  const url = `https://api.openmetrolinx.com/OpenDataAPI/api/V1/Schedule/Journey/${date}/${from}/${to}/${start}/${max}`;
+  try {
+    const response = await fetch(url, {
+      headers: { 'x-api-key': apiKey }
+    });
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'API error' });
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Serve static files (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+````
+
+---
+
+### 3. **Restart your server after changes**
+```sh
+node server.js
+```
+
+---
+
+### 4. **Test the endpoint directly**
+Visit:  
+[http://localhost:3000/api/journeys?date=20251002&from=oa&to=un&start=0900&max=5](http://localhost:3000/api/journeys?date=20251002&from=oa&to=un&start=0900&max=5)  
+You should see JSON, not a 404 or HTML.
+
+---
+
+**Summary:**  
+- API routes must be defined before static middleware.
+- Restart your server after changes.
+- Test the endpoint directly.
+
+Let me know if this solves your issue!
+
+saisenee: here's an example of the response from our api fetch. let's update the departures div accordingly.
+
+{
+    "Metadata": {
+        "TimeStamp": "2025-10-02 12:50:40",
+        "ErrorCode": "200",
+        "ErrorMessage": "OK"
+    },
+    "SchJourneys": [
+        {
+            "Date": "2025-10-02",
+            "Time": "09:00",
+            "To": "un",
+            "From": "oa",
+            "Services": [
+                {
+                    "Colour": "#98002e",
+                    "Type": "RB",
+                    "Direction": "E",
+                    "Code": "01",
+                    "StartTime": "2025-10-02 09:01:00",
+                    "EndTime": "2025-10-02 09:45:00",
+                    "Duration": "00:44:00",
+                    "Accessible": "",
+                    "Trips": {
+                        "Trip": [
+                            {
+                                "Number": "1710",
+                                "Display": "LW - Union Station",
+                                "Line": "LW",
+                                "Direction": "E",
+                                "LineVariant": "LW",
+                                "Type": "T",
+                                "Stops": {
+                                    "Stop": [
+                                        {
+                                            "Code": "OA",
+                                            "Order": 6,
+                                            "Time": "09:01",
+                                            "sortingTime": "0901",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "CL",
+                                            "Order": 7,
+                                            "Time": "09:08",
+                                            "sortingTime": "0908",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "PO",
+                                            "Order": 8,
+                                            "Time": "09:14",
+                                            "sortingTime": "0914",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "LO",
+                                            "Order": 9,
+                                            "Time": "09:21",
+                                            "sortingTime": "0921",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "MI",
+                                            "Order": 10,
+                                            "Time": "09:29",
+                                            "sortingTime": "0929",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "EX",
+                                            "Order": 11,
+                                            "Time": "09:36",
+                                            "sortingTime": "0936",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "UN",
+                                            "Order": 12,
+                                            "Time": "09:45",
+                                            "sortingTime": "0945",
+                                            "IsMajor": true
+                                        }
+                                    ]
+                                },
+                                "destinationStopCode": "UN",
+                                "departFromCode": "OA",
+                                "departFromAlternativeCode": null,
+                                "departFromTimingPoint": "oakvlS",
+                                "tripPatternId": 118
+                            }
+                        ]
+                    },
+                    "Transfers": {
+                        "Transfer": []
+                    },
+                    "TransferLinks": {
+                        "Link": []
+                    },
+                    "StartSortTime": "0901",
+                    "EndSortTime": "0945",
+                    "tripHash": "1710_",
+                    "transferCount": 0
+                },
+                {
+                    "Colour": "#98002e",
+                    "Type": "RB",
+                    "Direction": "E",
+                    "Code": "01",
+                    "StartTime": "2025-10-02 09:31:00",
+                    "EndTime": "2025-10-02 10:15:00",
+                    "Duration": "00:44:00",
+                    "Accessible": "",
+                    "Trips": {
+                        "Trip": [
+                            {
+                                "Number": "1012",
+                                "Display": "LW - Union Station",
+                                "Line": "LW",
+                                "Direction": "E",
+                                "LineVariant": "LW",
+                                "Type": "T",
+                                "Stops": {
+                                    "Stop": [
+                                        {
+                                            "Code": "OA",
+                                            "Order": 5,
+                                            "Time": "09:31",
+                                            "sortingTime": "0931",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "CL",
+                                            "Order": 6,
+                                            "Time": "09:38",
+                                            "sortingTime": "0938",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "PO",
+                                            "Order": 7,
+                                            "Time": "09:44",
+                                            "sortingTime": "0944",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "LO",
+                                            "Order": 8,
+                                            "Time": "09:51",
+                                            "sortingTime": "0951",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "MI",
+                                            "Order": 9,
+                                            "Time": "09:59",
+                                            "sortingTime": "0959",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "EX",
+                                            "Order": 10,
+                                            "Time": "10:06",
+                                            "sortingTime": "1006",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "UN",
+                                            "Order": 11,
+                                            "Time": "10:15",
+                                            "sortingTime": "1015",
+                                            "IsMajor": true
+                                        }
+                                    ]
+                                },
+                                "destinationStopCode": "UN",
+                                "departFromCode": "OA",
+                                "departFromAlternativeCode": null,
+                                "departFromTimingPoint": "oakvlS",
+                                "tripPatternId": 128
+                            }
+                        ]
+                    },
+                    "Transfers": {
+                        "Transfer": []
+                    },
+                    "TransferLinks": {
+                        "Link": []
+                    },
+                    "StartSortTime": "0931",
+                    "EndSortTime": "1015",
+                    "tripHash": "1012_",
+                    "transferCount": 0
+                },
+                {
+                    "Colour": "#98002e",
+                    "Type": "RB",
+                    "Direction": "E",
+                    "Code": "01",
+                    "StartTime": "2025-10-02 10:01:00",
+                    "EndTime": "2025-10-02 10:45:00",
+                    "Duration": "00:44:00",
+                    "Accessible": "",
+                    "Trips": {
+                        "Trip": [
+                            {
+                                "Number": "1712",
+                                "Display": "LW - Union Station",
+                                "Line": "LW",
+                                "Direction": "E",
+                                "LineVariant": "LW",
+                                "Type": "T",
+                                "Stops": {
+                                    "Stop": [
+                                        {
+                                            "Code": "OA",
+                                            "Order": 6,
+                                            "Time": "10:01",
+                                            "sortingTime": "1001",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "CL",
+                                            "Order": 7,
+                                            "Time": "10:08",
+                                            "sortingTime": "1008",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "PO",
+                                            "Order": 8,
+                                            "Time": "10:14",
+                                            "sortingTime": "1014",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "LO",
+                                            "Order": 9,
+                                            "Time": "10:21",
+                                            "sortingTime": "1021",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "MI",
+                                            "Order": 10,
+                                            "Time": "10:29",
+                                            "sortingTime": "1029",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "EX",
+                                            "Order": 11,
+                                            "Time": "10:36",
+                                            "sortingTime": "1036",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "UN",
+                                            "Order": 12,
+                                            "Time": "10:45",
+                                            "sortingTime": "1045",
+                                            "IsMajor": true
+                                        }
+                                    ]
+                                },
+                                "destinationStopCode": "UN",
+                                "departFromCode": "OA",
+                                "departFromAlternativeCode": null,
+                                "departFromTimingPoint": "oakvlS",
+                                "tripPatternId": 142
+                            }
+                        ]
+                    },
+                    "Transfers": {
+                        "Transfer": []
+                    },
+                    "TransferLinks": {
+                        "Link": []
+                    },
+                    "StartSortTime": "1001",
+                    "EndSortTime": "1045",
+                    "tripHash": "1712_",
+                    "transferCount": 0
+                },
+                {
+                    "Colour": "#98002e",
+                    "Type": "RB",
+                    "Direction": "E",
+                    "Code": "01",
+                    "StartTime": "2025-10-02 10:31:00",
+                    "EndTime": "2025-10-02 11:15:00",
+                    "Duration": "00:44:00",
+                    "Accessible": "",
+                    "Trips": {
+                        "Trip": [
+                            {
+                                "Number": "1014",
+                                "Display": "LW - Union Station",
+                                "Line": "LW",
+                                "Direction": "E",
+                                "LineVariant": "LW",
+                                "Type": "T",
+                                "Stops": {
+                                    "Stop": [
+                                        {
+                                            "Code": "OA",
+                                            "Order": 5,
+                                            "Time": "10:31",
+                                            "sortingTime": "1031",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "CL",
+                                            "Order": 6,
+                                            "Time": "10:38",
+                                            "sortingTime": "1038",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "PO",
+                                            "Order": 7,
+                                            "Time": "10:44",
+                                            "sortingTime": "1044",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "LO",
+                                            "Order": 8,
+                                            "Time": "10:51",
+                                            "sortingTime": "1051",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "MI",
+                                            "Order": 9,
+                                            "Time": "10:59",
+                                            "sortingTime": "1059",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "EX",
+                                            "Order": 10,
+                                            "Time": "11:06",
+                                            "sortingTime": "1106",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "UN",
+                                            "Order": 11,
+                                            "Time": "11:15",
+                                            "sortingTime": "1115",
+                                            "IsMajor": true
+                                        }
+                                    ]
+                                },
+                                "destinationStopCode": "UN",
+                                "departFromCode": "OA",
+                                "departFromAlternativeCode": null,
+                                "departFromTimingPoint": "oakvlS",
+                                "tripPatternId": 162
+                            }
+                        ]
+                    },
+                    "Transfers": {
+                        "Transfer": []
+                    },
+                    "TransferLinks": {
+                        "Link": []
+                    },
+                    "StartSortTime": "1031",
+                    "EndSortTime": "1115",
+                    "tripHash": "1014_",
+                    "transferCount": 0
+                },
+                {
+                    "Colour": "#98002e",
+                    "Type": "RB",
+                    "Direction": "E",
+                    "Code": "01",
+                    "StartTime": "2025-10-02 11:01:00",
+                    "EndTime": "2025-10-02 11:45:00",
+                    "Duration": "00:44:00",
+                    "Accessible": "",
+                    "Trips": {
+                        "Trip": [
+                            {
+                                "Number": "1714",
+                                "Display": "LW - Union Station",
+                                "Line": "LW",
+                                "Direction": "E",
+                                "LineVariant": "LW",
+                                "Type": "T",
+                                "Stops": {
+                                    "Stop": [
+                                        {
+                                            "Code": "OA",
+                                            "Order": 6,
+                                            "Time": "11:01",
+                                            "sortingTime": "1101",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "CL",
+                                            "Order": 7,
+                                            "Time": "11:08",
+                                            "sortingTime": "1108",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "PO",
+                                            "Order": 8,
+                                            "Time": "11:14",
+                                            "sortingTime": "1114",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "LO",
+                                            "Order": 9,
+                                            "Time": "11:21",
+                                            "sortingTime": "1121",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "MI",
+                                            "Order": 10,
+                                            "Time": "11:29",
+                                            "sortingTime": "1129",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "EX",
+                                            "Order": 11,
+                                            "Time": "11:36",
+                                            "sortingTime": "1136",
+                                            "IsMajor": true
+                                        },
+                                        {
+                                            "Code": "UN",
+                                            "Order": 12,
+                                            "Time": "11:45",
+                                            "sortingTime": "1145",
+                                            "IsMajor": true
+                                        }
+                                    ]
+                                },
+                                "destinationStopCode": "UN",
+                                "departFromCode": "OA",
+                                "departFromAlternativeCode": null,
+                                "departFromTimingPoint": "oakvlS",
+                                "tripPatternId": 174
+                            }
+                        ]
+                    },
+                    "Transfers": {
+                        "Transfer": []
+                    },
+                    "TransferLinks": {
+                        "Link": []
+                    },
+                    "StartSortTime": "1101",
+                    "EndSortTime": "1145",
+                    "tripHash": "1714_",
+                    "transferCount": 0
+                }
+            ]
+        }
+    ]
+}
+
+GitHub Copilot: Here’s how you can update your script.js to display the departures using the structure of your API response (`SchJourneys` → `Services` → `Trips`):
+
+````javascript
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('loading').textContent = 'Loading...';
+
+  fetch('/api/journeys?date=20251002&from=oa&to=un&start=0900&max=5')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('loading').style.display = 'none';
+      const departuresDiv = document.getElementById('departures');
+      departuresDiv.innerHTML = '';
+
+      // Check for SchJourneys and Services
+      if (
+        !data ||
+        !data.SchJourneys ||
+        !Array.isArray(data.SchJourneys) ||
+        data.SchJourneys.length === 0 ||
+        !data.SchJourneys[0].Services ||
+        !Array.isArray(data.SchJourneys[0].Services) ||
+        data.SchJourneys[0].Services.length === 0
+      ) {
+        departuresDiv.innerHTML = '<p>No departures found.</p>';
+        return;
+      }
+
+      const list = document.createElement('ul');
+
+      data.SchJourneys[0].Services.forEach(service => {
+        // Each service may have multiple trips
+        const trips = service.Trips && service.Trips.Trip ? service.Trips.Trip : [];
+        trips.forEach(trip => {
+          // Get stops for this trip
+          const stops = trip.Stops && trip.Stops.Stop ? trip.Stops.Stop : [];
+          const departStop = stops[0];
+          const arriveStop = stops[stops.length - 1];
+
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <strong>Trip ${trip.Number} (${trip.Display})</strong><br>
+            Departure: <span style="color:green">${departStop?.Time || 'N/A'}</span> from <b>${departStop?.Code || 'N/A'}</b>
+            &rarr; Arrival: <span style="color:blue">${arriveStop?.Time || 'N/A'}</span> at <b>${arriveStop?.Code || 'N/A'}</b>
+            <br>Duration: ${service.Duration}
+          `;
+          list.appendChild(li);
+        });
+      });
+
+      departuresDiv.appendChild(list);
+    })
+    .catch(err => {
+      document.getElementById('loading').textContent = 'Error loading departures.';
+      console.error('Error fetching journey data:', err);
+    });
+});
+````
+
+This will show a list of trips with departure and arrival times and stations, matching your API response structure.  
+You can further style or format the output as needed!
+
+saisenee: this looks good please implement the updates
+
+GitHub Copilot: Using "Apply Patch"
+
+Created [](file:///c%3A/Users/evans/OneDrive/Documents/GitHub/GOTransitAPI/public/script.js)
+
+Using "Apply Patch"
+
+
+```
+
+```
+The departures display logic has been implemented in your `script.js`. Your page will now show a list of trips with departure and arrival times, stations, and duration based on the API response.
+
+Reload your page to see the updated departures list. Let me know if you want further customization or improvements!
+
+Made changes.
+
+saisenee: This endpoint contains all stops including go stations. It will serve as a lookup for two letter codes (ie. OA) as a display name (ie. Oakville GO). lets apply this to our template.  do the stop fetch upfront 
+
+https://api.openmetrolinx.com/OpenDataAPI/api/V1/Stop/All?key=30025820
+
+{
+	"Metadata": {
+		"TimeStamp": "2025-10-02 13:01:18",
+		"ErrorCode": "200",
+		"ErrorMessage": "OK"
+	},
+	"Stations": {
+		"Station": [
+			{
+				"LocationCode": "00005",
+				"PublicStopId": "100005",
+				"LocationName": "Yonge St. @ Baif Blvd. (Hillcrest Mall)",
+				"LocationType": "Bus Stop"
+			},
+			{
+				"LocationCode": "00006",
+				"PublicStopId": "100006",
+				"LocationName": "Yonge St. @ Hwy. 407",
+				"LocationType": "Bus Stop"
+			},
+			{
+				"LocationCode": "00008",
+				"PublicStopId": "100008",
+				"LocationName": "Yonge St. @ Sheppard Ave.",
+				"LocationType": "Bus Stop"
+			},
+			{
+				"LocationCode": "00011",
+				"PublicStopId": "100011",
+				"LocationName": "York Mills Bus Terminal",
+				"LocationType": "Bus Terminal"
+			},
+			{
+				"LocationCode": "00013",
+				"PublicStopId": "100013",
+				"LocationName": "Finch Bus Terminal",
+				"LocationType": "Bus Terminal"
+			},
+			{
+				"LocationCode": "00014",
+				"PublicStopId": "100014",
+				"LocationName": "Yonge St. @ Langstaff Rd. E.",
+				"LocationType": "Bus Stop"
+			},
+			{
+				"LocationCode": "00015",
+				"PublicStopId": "100015",
+				"LocationName": "Yonge St. @ 16th Ave. (South Hill Shopping Centre)",
+				"LocationType": "Bus Stop"
+			},
+			{
+				"LocationCode": "00019",
+				"PublicStopId": "100019",
+				"LocationName": "Yorkdale Bus Terminal",
+				"LocationType": "Bus Terminal"
+			},
+			{
+				"LocationCode": "00020",
+				"PublicStopId": "100020",
+				"LocationName": "Hwy. 401 @ Keele St.",
+				"LocationType": "Bus Stop"
+			},
+			{
+				"LocationCode": "00021",
+				"PublicStopId": "100021",
+				"LocationName": "Hwy. 9 @ Hwy. 400 Park & Ride",
+				"LocationType": "Park & Ride"
+			},
+			{
+				"LocationCode": "00022",
+				"PublicStopId": "100022",
+				"LocationName": "Keele St. @ Hwy. 401",
+				"LocationType": "Bus Stop"
+			},
+			{
+				"LocationCode": "00025",
+				"PublicStopId": "100025",
+				"LocationName": "Barrie St. @ Holland St. W.",
+				"LocationType": "Bus Stop"
+			},
+			{
+				"LocationCode": "00027",
+				"PublicStopId": "100027",
+				"LocationName": "Keele St. @ Station Rd. (King City GO)",
+				"LocationType": "Bus Stop"
+			},
+			{
+				"LocationCode": "00028",
+				"PublicStopId": "100028",
+				"LocationName": "Rutherford GO",
+				"LocationType": "Bus Stop"
+			},
+
+GitHub Copilot: Using "Apply Patch"
+
+
+```
+
+```
+Your `script.js` now fetches all stops first, builds a code-to-name lookup, and displays stop names in the departures list.  
+There is a minor syntax issue at the end of the file (likely an extra or misplaced closing brace). Would you like me to fix this error for you?
+
+Made changes.
+
+saisenee: yes
+
+GitHub Copilot: Using "Apply Patch"
+
+
+```
+
+```
+The syntax error has been fixed in your `script.js`. Your departures list should now display with stop names correctly. If you encounter any further issues or want more enhancements, let me know!
+
+Made changes.
+
+saisenee: we should make the request for the stops via ther server to avoid Cors issues. make an endpoint on the server to work as a relay.
+
+GitHub Copilot: Using "Apply Patch"
+
+
+```
+
+```
+
+
+Using "Apply Patch"
+
+
+```
+
+```
+You now have a new `/api/stops` endpoint on your server that relays the stops data, and your `script.js` fetches stops from this endpoint to avoid CORS issues. Restart your server and reload your page—your departures list will continue to show stop names, but now with no CORS errors. Let me know if you need further help!
+
+Made changes.
