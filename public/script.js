@@ -1,25 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('loading').textContent = 'Loading...';
 
+  /* Fetch made with Github Copilot with rules specified by myself and the API info*/
   // Fetch all stops from our server relay and build a code-to-name lookup
   fetch('/api/stops')
     .then(res => res.json())
     .then(stopsData => {
-      // Build a lookup: code (uppercased) => name
       const codeToName = {};
       if (stopsData && stopsData.Stations && Array.isArray(stopsData.Stations.Station)) {
         stopsData.Stations.Station.forEach(station => {
-          // Use two-letter code if possible, else LocationCode
-          // We'll try to match OA, UN, etc. to LocationName
           if (station.LocationName && station.LocationCode) {
-            // Some LocationCodes are numbers, but for GO stations, the two-letter code is often in the name (e.g., "Oakville GO")
-            // We'll map by uppercase code if possible
-            // You may want to enhance this mapping if you have a better code source
             codeToName[station.LocationCode.toUpperCase()] = station.LocationName;
           }
         });
       }
 
+      /*Function made with Github Copilot and myself */
       // Function to fetch journeys starting from the current time and render
       function getYYYYMMDD(d) {
         const yyyy = d.getFullYear();
@@ -58,19 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return a - s; // minutes (positive = delayed)
       }
 
-      // track currently selected station code (default to 'union')
       let selectedStationCode = 'union';
 
-      // helper to update selected station (called from button clicks)
+      /* SVG editing made with Github Copilot */
       function setSelectedStation(code) {
-        // do not allow selecting oakville because it is the user's current station
         if (code === 'oakville') return;
         selectedStationCode = code;
-        // update button styles
         document.querySelectorAll('.station-btn').forEach(btn => {
           btn.classList.toggle('selected', btn.dataset.code === code);
         });
-        // update small inline SVG dots: toggle .active class to switch color via CSS
         document.querySelectorAll('#stationList .station-row').forEach(row => {
           const dot = row.querySelector('.station-dot');
           const btn = row.querySelector('.station-btn');
@@ -80,12 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
           if (rowCode === code) {
             dot.classList.add('active');
           } else {
-            // Keep Oakville active
             if (rowCode === 'oakville') dot.classList.add('active');
             else dot.classList.remove('active');
           }
         });
-        // no inline SVG to update anymore; small ellipses handle the visual state
       }
 
       // wire station buttons after DOM ready
@@ -114,14 +104,15 @@ document.addEventListener('DOMContentLoaded', () => {
       // set initial selected station (union remains default)
       setSelectedStation(selectedStationCode);
 
+      /* Rule for exceptions */
       // map from our data-code to the two-letter Metrolinx API code
       const twoLetterOverrides = {
         // explicit overrides if the simple 'first two letters' rule doesn't match API codes
         // Bronte should map to 'bo' instead of 'br'
         'bronte': 'bo',
-        // you can add others here (e.g., 'port_credit': 'pc')
       };
 
+      /* Function created by Github Copilot to map station codes to API codes */
       function toApiCode(stationCode) {
         if (!stationCode) return stationCode;
         if (twoLetterOverrides[stationCode]) return twoLetterOverrides[stationCode];
@@ -131,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return token.slice(0, 2).toLowerCase();
       }
 
+      /* URL edited by myself */
       async function fetchAndRenderJourneys() {
         const now = new Date();
         const dateStr = getYYYYMMDD(now);
@@ -160,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
 
-          // table
+         /* Table created by Github Copilot */
           const table = document.createElement('table');
           table.id = 'departuresTable';
           const thead = table.createTHead();
@@ -202,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
               let statusText = 'On time';
               let statusClass = 'status-on';
 
+              /* Implemented by the copilot but I think the current fetch does not have this information... In the future I would do another fetch for this. */
               // Detect cancellation
               if (trip?.Cancelled || trip?.IsCancelled || service?.Cancelled) {
                 statusText = 'Cancelled';
@@ -231,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
               tdStatus.className = statusClass;
               tr.appendChild(tdStatus);
 
+              /* original table, now scrapped for new layout */
               // const tdFrom = document.createElement('td');
               // tdFrom.textContent = departName;
               // tr.appendChild(tdFrom);
@@ -254,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
           });
 
+      
           departuresDiv.appendChild(table);
         } catch (err) {
           document.getElementById('loading').textContent = 'Error loading departures.';
@@ -261,6 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      /* refresh created with copilot */
       // initial fetch and poll every 60 seconds
       fetchAndRenderJourneys();
       setInterval(fetchAndRenderJourneys, 60 * 1000);
@@ -274,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const liveClockEl = document.getElementById('liveClock');
   const clockToggle = document.getElementById('clockToggle');
 
+  /* cookie storage, clock formatting made by copilot*/
   // Load saved preference ("24" or "12"). Default to 12h.
   let clockFormat = localStorage.getItem('clockFormat') || '12';
   function applyToggleState() {

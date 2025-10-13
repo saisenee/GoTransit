@@ -23,6 +23,8 @@ body{
     color: #333;
     
 }
+
+/* Header stylling was done by myself */
 header{
     background-color: #4CAF50;
     color: white;
@@ -52,6 +54,7 @@ header{
     gap: 15px;
 }
 
+/* Clock was done partially by Github Co-Pilot and myself for stylling */
 #liveClock {
   font-family: "Reddit Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, monospace;
   font-size: 1.9em; 
@@ -84,18 +87,6 @@ header{
   background: rgba(255,255,255,0.12);
 }
 
-/* small screen adjustments */
-@media (max-width: 600px) {
-  #navgrid {
-    grid-template-columns: auto 1fr;
-    grid-auto-rows: auto;
-  }
-  #liveClock {
-    font-size: 0.9em;
-    padding-right: 8px;
-  }
-}
-
 #tableGrid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -104,6 +95,8 @@ header{
       position: relative;
   z-index: 1;
 }
+
+/* Departures table was created by Github Copilot and stylled by myself */
 #departuresTable {
   width: 100%;
   border-collapse: collapse;
@@ -137,6 +130,7 @@ header{
 #departuresTable tbody tr:nth-child(odd) { background: rgba(255,255,255,0.01); }
 #departuresTable tbody tr:hover { background: rgba(255,255,255,0.03); }
 
+/* Station selector was done partially by myself and with Github Copilot for SVG styling */
 #stationSelect {
   background-color: #4CAF50;
   color: white;
