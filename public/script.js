@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('loading').textContent = 'Loading...';
 
-  /* Fetch made with Github Copilot with rules specified by myself and the API info*/
+  // /* Fetch made with Github Copilot with rules specified by myself and the API info*/
   // Fetch all stops from our server relay and build a code-to-name lookup
   fetch('/api/stops')
     .then(res => res.json())
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      /*Function made with Github Copilot and myself */
+      // /*Function made with Github Copilot and myself */
       // Function to fetch journeys starting from the current time and render
       function getYYYYMMDD(d) {
         const yyyy = d.getFullYear();
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let selectedStationCode = 'union';
 
-      /* SVG editing made with Github Copilot */
+      // /* SVG editing made with Github Copilot */
       function setSelectedStation(code) {
         if (code === 'oakville') return;
         selectedStationCode = code;
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // set initial selected station (union remains default)
       setSelectedStation(selectedStationCode);
 
-      /* Rule for exceptions */
+      // /* Rule for exceptions */
       // map from our data-code to the two-letter Metrolinx API code
       const twoLetterOverrides = {
         // explicit overrides if the simple 'first two letters' rule doesn't match API codes
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'bronte': 'bo',
       };
 
-      /* Function created by Github Copilot to map station codes to API codes */
+      // /* Function created by Github Copilot to map station codes to API codes */
       function toApiCode(stationCode) {
         if (!stationCode) return stationCode;
         if (twoLetterOverrides[stationCode]) return twoLetterOverrides[stationCode];
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return token.slice(0, 2).toLowerCase();
       }
 
-      /* URL edited by myself */
+      // /* URL edited by myself */
       async function fetchAndRenderJourneys() {
         const now = new Date();
         const dateStr = getYYYYMMDD(now);
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
 
-         /* Table created by Github Copilot */
+        //  /* Table created by Github Copilot */
           const table = document.createElement('table');
           table.id = 'departuresTable';
           const thead = table.createTHead();
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
               let statusText = 'On time';
               let statusClass = 'status-on';
 
-              /* Implemented by the copilot but I think the current fetch does not have this information... In the future I would do another fetch for this. */
+              // /* Implemented by the copilot but I think the current fetch does not have this information... In the future I would do another fetch for this. */
               // Detect cancellation
               if (trip?.Cancelled || trip?.IsCancelled || service?.Cancelled) {
                 statusText = 'Cancelled';
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
               tdStatus.className = statusClass;
               tr.appendChild(tdStatus);
 
-              /* original table, now scrapped for new layout */
+              // /* original table, now scrapped for new layout */
               // const tdFrom = document.createElement('td');
               // tdFrom.textContent = departName;
               // tr.appendChild(tdFrom);
@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      /* refresh created with copilot */
+      // /* refresh created with copilot */
       // initial fetch and poll every 60 seconds
       fetchAndRenderJourneys();
       setInterval(fetchAndRenderJourneys, 60 * 1000);
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const liveClockEl = document.getElementById('liveClock');
   const clockToggle = document.getElementById('clockToggle');
 
-  /* cookie storage, clock formatting made by copilot*/
+  // /* cookie storage, clock formatting made by copilot*/
   // Load saved preference ("24" or "12"). Default to 12h.
   let clockFormat = localStorage.getItem('clockFormat') || '12';
   function applyToggleState() {
